@@ -1,0 +1,14 @@
+{
+    "builds":[
+        {
+            "src" : "JsonValidate.py",
+            "use" : "@vercel/python"
+        }
+    ],
+    "routes" :[
+        {
+        "src" : "/(.*)",
+        "dest" : "JsonValidate.py"
+        }
+    ]
+}
