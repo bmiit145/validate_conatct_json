@@ -22,9 +22,9 @@ json_data = '[{"abc":"1","name":"ascf"},{"abc":"6","name":"65"}]'
 result = validate_json(json_data)
 print(result)
 
-@app.route('/' , methods=['GET'])
+@app.route('/')
 def home():
-    print("Welcome")
+    return ("Welcome")
 
 @app.route('/validate', methods=['POST'])
 def validate_endpoint():
