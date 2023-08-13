@@ -9,17 +9,20 @@ def validate_json(json_data):
         validated_data = []
 
         for item in data:
-            if "phone" in item:
-                phone = item['phone']
-                phone = phone.replace(' ', '')  # Remove spaces
+            phone_key = next((key for key in item.keys() if key.lower() == 'phone'), None)
+            if phone_key:
+                if "phone" in item:
+                    phone = item[phone_key]
+                    phone = phone.replace(' ', '')  # Remove spaces
 
-                if phone.startswith('91') and len(phone) == 12:
-                    phone = '+' + phone
-                elif not phone.startswith('+91') and len(phone) == 10:    #For start with +91
-                     phone = '+91' + phone
-                
-                if len(phone) == 13:                #check length
-                    validated_data.append({"phone": phone})
+                    if phone.startswith('91') and len(phone) == 12:
+                        phone = '+' + phone
+                    elif not phone.startswith('+91') and len(phone) == 10:    #For start with +91
+                        phone = '+91' + phone
+                    
+                    if len(phone) == 13:                #check length
+                        validated_data.append({"phone": phone})
+            
         return {"validated_data": validated_data}
     except json.JSONDecodeError:
         return {"error": "Invalid JSON format"}
