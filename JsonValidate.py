@@ -9,9 +9,16 @@ def validate_json(json_data):
         validated_data = []
 
         for item in data:
-            if "name" in item and item["name"].startswith("a"):
-                validated_data.append({"name": item["name"]})
+            if "phone" in item:
+                phone = item['phone']
+                phone = phone.replace(' ', '')  # Remove spaces
 
+                if not phone.startswith('+91') and len(phone) == 10:    #For start with +91
+                     phone = '+91' + phone
+                elif phone.startswith('91') and len(phone) == 12:
+                    phone = '+' + phone
+                if len(phone) == 13:                #check length
+                    validated_data.append({"phone": phone})
         return {"validated_data": validated_data}
     except json.JSONDecodeError:
         return {"error": "Invalid JSON format"}
