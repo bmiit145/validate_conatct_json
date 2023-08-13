@@ -13,10 +13,11 @@ def validate_json(json_data):
                 phone = item['phone']
                 phone = phone.replace(' ', '')  # Remove spaces
 
-                if not phone.startswith('+91') and len(phone) == 10:    #For start with +91
-                     phone = '+91' + phone
-                elif phone.startswith('91') and len(phone) == 12:
+                if phone.startswith('91') and len(phone) == 12:
                     phone = '+' + phone
+                elif not phone.startswith('+91') and len(phone) == 10:    #For start with +91
+                     phone = '+91' + phone
+                
                 if len(phone) == 13:                #check length
                     validated_data.append({"phone": phone})
         return {"validated_data": validated_data}
