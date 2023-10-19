@@ -15,10 +15,12 @@ def validate_json(json_data):
         if 'phone' in df.columns:
             # Convert the 'phone' column to strings
             df['phone'] = df['phone'].astype(str)
-            
+
             # Remove spaces from the 'phone' column
             df['phone'] = df['phone'].str.replace(' ', '')
 
+            df['phone'].drop_duplicates(inplace=True)
+            
             # Apply validation rules to the 'phone' column
             mask = (
                 ((df['phone'].str.startswith('91') & (df['phone'].str.len() == 12)) |
