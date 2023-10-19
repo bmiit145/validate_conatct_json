@@ -1,6 +1,8 @@
+import re
 from flask import Flask, request, jsonify
 import pandas as pd
 import json
+
 
 app = Flask(__name__)
 
@@ -22,12 +24,13 @@ def validate_json(json_data):
             # give unique only
             df.drop_duplicates(subset=['phone'], keep='first', inplace=True)
 
-            print(df['phone'])
-
+            # Add country code prefix to phone numbers
+            df['phone'] = df['phone'].apply(lambda phone: '+' + phone if phone.startswith('91') and len(phone) == 12 else ('+91' + phone if not phone.startswith('+91') and len(phone) == 10 else phone))
+            
             # Apply validation rules to the 'phone' column
             mask = (
-                ((df['phone'].str.startswith('91') & (df['phone'].str.len() == 12)) |
-                (df['phone'].str.startswith('+91') & (df['phone'].str.len() == 13)))
+                df['phone'].apply(lambda phone: bool(re.match(r'^\+?91\d{10}$', phone))) |
+                df['phone'].apply(lambda phone: bool(re.match(r'^\+\d{12}$', phone)))
             )
 
             # Create a new DataFrame with valid phone numbers
