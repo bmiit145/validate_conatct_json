@@ -13,6 +13,9 @@ def validate_json(json_data):
 
         # Ensure 'phone' column exists
         if 'phone' in df.columns:
+            # Convert the 'phone' column to strings
+            df['phone'] = df['phone'].astype(str)
+            
             # Remove spaces from the 'phone' column
             df['phone'] = df['phone'].str.replace(' ', '')
 
