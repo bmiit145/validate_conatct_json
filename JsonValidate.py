@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import pandas as pd
 import json
 
 app = Flask(__name__)
@@ -6,43 +7,43 @@ app = Flask(__name__)
 def validate_json(json_data):
     try:
         data = json.loads(json_data)
-        validated_data = []
 
-        for item in data:
-            phone_key = next((key for key in item.keys() if key.lower() == 'phone'), None)
-            if phone_key:
-                # if "phone" in item:
-                phone = item[phone_key]
-                phone = phone.replace(' ', '')  # Remove spaces
+        # Create a Pandas DataFrame from the JSON data
+        df = pd.DataFrame(data)
 
-                if phone.startswith('91') and len(phone) == 12:
-                    phone = '+' + phone
-                elif not phone.startswith('+91') and len(phone) == 10:    #For start with +91
-                    phone = '+91' + phone
-                    
-                if len(phone) == 13:                #check length
-                    validated_data.append({"phone": phone})
-                    
-        return {"validated_data": validated_data}
+        # Ensure 'phone' column exists
+        if 'phone' in df.columns:
+            # Remove spaces from the 'phone' column
+            df['phone'] = df['phone'].str.replace(' ', '')
+
+            # Apply validation rules to the 'phone' column
+            mask = (
+                ((df['phone'].str.startswith('91') & (df['phone'].str.len() == 12)) |
+                (df['phone'].str.startswith('+91') & (df['phone'].str.len() == 13)))
+            )
+
+            # Create a new DataFrame with valid phone numbers
+            validated_data = df[mask]
+
+            # Convert the valid phone numbers to a list of dictionaries
+            validated_data = validated_data.to_dict(orient='records')
+
+            return {"validated_data": validated_data}
+        else:
+            return {"error": "No 'phone' key found in JSON data"}
+
     except json.JSONDecodeError:
         return {"error": "Invalid JSON format"}
 
-# Example JSON data
-json_data = '[{"abc":"1","name":"ascf"},{"abc":"6","name":"65"}]'
-
-result = validate_json(json_data)
-print(result)
-
 @app.route('/')
 def home():
-    return ("Welcome")
+    return "Welcome"
 
 @app.route('/validate', methods=['POST'])
 def validate_endpoint():
     json_data = request.data.decode('utf-8')
     result = validate_json(json_data)
     return jsonify(result)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
