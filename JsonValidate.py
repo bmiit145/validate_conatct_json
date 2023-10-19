@@ -19,8 +19,11 @@ def validate_json(json_data):
             # Remove spaces from the 'phone' column
             df['phone'] = df['phone'].str.replace(' ', '')
 
-            df['phone'].drop_duplicates(inplace=True)
-            
+            # give unique only
+            df.drop_duplicates(subset=['phone'], keep='first', inplace=True)
+
+            print(df['phone'])
+
             # Apply validation rules to the 'phone' column
             mask = (
                 ((df['phone'].str.startswith('91') & (df['phone'].str.len() == 12)) |
@@ -39,6 +42,13 @@ def validate_json(json_data):
 
     except json.JSONDecodeError:
         return {"error": "Invalid JSON format"}
+
+
+json_data = '[{"phone":"1","name":"ascf"},{"phone":"6","name":"65"}]'
+
+result = validate_json(json_data)
+print(result)
+
 
 @app.route('/')
 def home():

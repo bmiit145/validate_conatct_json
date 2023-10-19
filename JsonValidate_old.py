@@ -28,7 +28,7 @@ def validate_json(json_data):
         return {"error": "Invalid JSON format"}
 
 # Example JSON data
-json_data = '[{"abc":"1","name":"ascf"},{"abc":"6","name":"65"}]'
+json_data = '[{"phone":"1","name":"ascf"},{"phone":"6","name":"65"}]'
 
 result = validate_json(json_data)
 print(result)
