@@ -21,16 +21,21 @@ def validate_json(json_data):
             # Remove spaces from the 'phone' column
             df['phone'] = df['phone'].str.replace(' ', '')
 
+
+            # Filter out phone numbers that contain non-numeric characters
+            df = df[df['phone'].str.match(r'^\+?\d+$')]
+
             # give unique only
             df.drop_duplicates(subset=['phone'], keep='first', inplace=True)
 
-            # Add country code prefix to phone numbers
+            # Add country code +91 prefix to phone numbers
             df['phone'] = df['phone'].apply(lambda phone: '+' + phone if phone.startswith('91') and len(phone) == 12 else ('+91' + phone if not phone.startswith('+91') and len(phone) == 10 else phone))
             
-            # Apply validation rules to the 'phone' column
+
+            # Apply validation rules to the 'phone' column which accept a any country code
             mask = (
-                df['phone'].apply(lambda phone: bool(re.match(r'^\+?91\d{10}$', phone))) |
-                df['phone'].apply(lambda phone: bool(re.match(r'^\+\d{12}$', phone)))
+               (df['phone'].str.startswith('+91') & (df['phone'].str.len() == 13)) |
+                (df['phone'].str.startswith('+') & ~df['phone'].str.startswith('+91') & (df['phone'].str.len() <= 15))
             )
 
             # Create a new DataFrame with valid phone numbers
@@ -39,6 +44,7 @@ def validate_json(json_data):
             # Convert the valid phone numbers to a list of dictionaries
             validated_data = validated_data.to_dict(orient='records')
 
+            #  retrun the validated data
             return {"validated_data": validated_data}
         else:
             return {"error": "No 'phone' key found in JSON data"}
@@ -47,10 +53,10 @@ def validate_json(json_data):
         return {"error": "Invalid JSON format"}
 
 
-json_data = '[{"phone":"1","name":"ascf"},{"phone":"6","name":"65"}]'
+# json_data = '[{"phone":"1","name":"ascf"},{"phone":"6","name":"65"}]'
 
-result = validate_json(json_data)
-print(result)
+# result = validate_json(json_data)
+# print(result)
 
 
 @app.route('/')
